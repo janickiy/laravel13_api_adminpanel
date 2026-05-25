@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin\Admin;
 
+use App\Models\Admin;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreRequest extends FormRequest
 {
@@ -22,11 +24,11 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'login' => 'required|unique:users|min:3|max:255',
-            'name' => 'required',
-            'role' => 'required',
-            'password' => 'required|min:6',
-            'password_again' => 'required|min:6|same:password',
+            'login' => ['required', 'string', 'min:3', 'max:255', Rule::unique(Admin::getTableName(), 'login')],
+            'name' => ['required', 'string', 'max:255'],
+            'role' => ['required', Rule::in(array_keys(Admin::$role_name))],
+            'password' => ['required', 'string', 'min:6'],
+            'password_again' => ['required', 'string', 'min:6', 'same:password'],
         ];
     }
 }

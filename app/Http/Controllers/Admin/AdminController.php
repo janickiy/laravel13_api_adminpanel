@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DTO\Admin\AdminData;
 use App\Models\Admin;
 use App\Http\Requests\Admin\Admin\StoreRequest;
 use App\Http\Requests\Admin\Admin\EditRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class AdminController extends Controller
 {
@@ -37,9 +39,13 @@ class AdminController extends Controller
      */
     public function store(StoreRequest $request): RedirectResponse
     {
-        Admin::create(array_merge($request->all(), ['password' => Hash::make($request->password)]));
+        $data = AdminData::fromArray($request->validated());
+        $payload = $data->toArray();
+        $payload['password'] = Hash::make((string) $data->password);
 
-        return redirect()->route('admin.index')->with('success', 'Информация успешно добавлена!');
+        Admin::create($payload);
+
+        return redirect()->route('admin.admin.index')->with('success', 'Информация успешно добавлена!');
     }
 
     /**
@@ -63,30 +69,44 @@ class AdminController extends Controller
      */
     public function update(EditRequest $request): RedirectResponse
     {
-        $admin = Admin::find($request->id);
+        $data = AdminData::fromArray($request->validated());
+        $admin = Admin::find($data->id);
 
         if (!$admin) abort(404);
 
-        $admin->login = $request->input('login');
-        $admin->name = $request->input('name');
+        $payload = $data->toArray();
 
-        if (!empty($request->role)) $admin->role = $request->input('role');
-
-        if (!empty($request->password)) {
-            $admin->password = Hash::make($request->password);
+        if ($data->password !== null) {
+            $payload['password'] = Hash::make($data->password);
         }
 
+        $admin->fill($payload);
         $admin->save();
 
         return redirect()->route('admin.admin.index')->with('success', 'Данные успешно обновлены!');
     }
 
     /**
-     * @param Request $request
-     * @return void
+     * @param int $id
+     * @return JsonResponse
      */
-    public function destroy(Request $request): void
+    public function destroy(int $id): JsonResponse
     {
-        if ($request->id !== Auth::id()) Admin::find($request->id)->delete();
+        if ($id === (int) Auth::id()) {
+            return response()->json(
+                ['message' => 'Нельзя удалить текущего пользователя.'],
+                Response::HTTP_FORBIDDEN,
+            );
+        }
+
+        $admin = Admin::find($id);
+
+        if (!$admin) {
+            return response()->json(['message' => 'Запись не найдена.'], Response::HTTP_NOT_FOUND);
+        }
+
+        $admin->delete();
+
+        return response()->json(['message' => 'Данные успешно удалены.']);
     }
 }

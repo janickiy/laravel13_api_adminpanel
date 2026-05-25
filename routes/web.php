@@ -19,7 +19,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('store', [AdminController::class, 'store'])->name('admin.admin.store');
     Route::get('edit/{id}', [AdminController::class, 'edit'])->name('admin.admin.edit')->where('id', '[0-9]+');
     Route::put('update', [AdminController::class, 'update'])->name('admin.admin.update');
-    Route::post('destroy', [AdminController::class, 'destroy'])->name('admin.admin.destroy')->where('id', '[0-9]+');
+    Route::delete('destroy/{id}', [AdminController::class, 'destroy'])->name('admin.admin.destroy')->where('id', '[0-9]+');
 });
 
 Route::middleware(['permission:admin|moderator'])->group(function () {
@@ -27,7 +27,7 @@ Route::middleware(['permission:admin|moderator'])->group(function () {
         Route::get('', [NotesController::class, 'index'])->name('admin.notes.index');
         Route::get('edit/{id}', [NotesController::class, 'edit'])->name('admin.notes.edit')->where('id', '[0-9]+');
         Route::put('update', [NotesController::class, 'update'])->name('admin.notes.update');
-        Route::post('destroy', [NotesController::class, 'destroy'])->name('admin.notes.destroy');
+        Route::delete('destroy/{id}', [NotesController::class, 'destroy'])->name('admin.notes.destroy')->where('id', '[0-9]+');
     });
 });
 
@@ -37,7 +37,7 @@ Route::group(['prefix' => 'catalog'], function () {
     Route::post('store', [CatalogController::class, 'store'])->name('admin.catalog.store');
     Route::get('edit/{id}', [CatalogController::class, 'edit'])->name('admin.catalog.edit')->where('id', '[0-9]+');
     Route::put('update', [CatalogController::class, 'update'])->name('admin.catalog.update');
-    Route::post('destroy', [CatalogController::class, 'destroy'])->name('admin.catalog.destroy');
+    Route::delete('destroy/{id}', [CatalogController::class, 'destroy'])->name('admin.catalog.destroy')->where('id', '[0-9]+');
 });
 
 Route::group(['prefix' => 'datatable'], function () {

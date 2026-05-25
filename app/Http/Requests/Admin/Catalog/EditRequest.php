@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\Catalog;
 
+use App\Models\Catalog;
 use Illuminate\Foundation\Http\FormRequest;
 
 class EditRequest extends FormRequest
@@ -22,7 +23,8 @@ class EditRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|integer|exists:catalog,id'
+            'id' => ['required', 'integer', 'exists:' . Catalog::getTableName() . ',id'],
+            'name' => ['required', 'string', 'max:255'],
         ];
     }
 }

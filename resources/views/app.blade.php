@@ -135,7 +135,7 @@
                         <a href="{{ route('admin.catalog.index') }}" class="nav-link{{ Request::is('catalog*') ? ' active' : '' }}"
                            title="Каталог">
                             <i class="nav-icon fas fa-list"></i>
-                            <p>заметки</p>
+                            <p>каталог</p>
                         </a>
                     </li>
 

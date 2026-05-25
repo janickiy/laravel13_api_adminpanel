@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\DTO\Notes\NoteData;
 use App\Repositories\NoteRepository;
 use App\Http\Requests\Admin\Notes\EditRequest;
-use App\Http\Requests\Admin\Notes\DeleteRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Exception;
@@ -48,7 +50,7 @@ class NotesController extends Controller
     public function update(EditRequest $request): RedirectResponse
     {
         try {
-            $this->noteRepository->update($request->id, $request->all());
+            $this->noteRepository->update(NoteData::fromArray($request->validated()));
         } catch (Exception $e) {
             report($e);
 
@@ -61,11 +63,15 @@ class NotesController extends Controller
         return redirect()->route('admin.notes.index')->with('success', 'Данные обновлены успешно');
     }
     /**
-     * @param DeleteRequest $request
-     * @return void
+     * @param int $id
+     * @return JsonResponse
      */
-    public function destroy(DeleteRequest $request): void
+    public function destroy(int $id): JsonResponse
     {
-        $this->noteRepository->delete($request->id);;
+        if (!$this->noteRepository->delete($id)) {
+            return response()->json(['message' => 'Запись не найдена.'], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json(['message' => 'Данные успешно удалены.']);
     }
 }

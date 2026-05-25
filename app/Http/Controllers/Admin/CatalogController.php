@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DTO\Catalog\CatalogData;
 use App\Repositories\CatalogRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 use App\Http\Requests\Admin\Catalog\{
     StoreRequest,
     EditRequest,
-    DeleteRequest,
 };
 use Exception;
 
@@ -26,7 +28,6 @@ class CatalogController extends Controller
      */
     public function index(): View
     {
-        dd(public_path(config('l5-swagger.documentations.default.paths.swagger_ui_assets_path') . 'swagger-ui.css'));
         return view('admin.catalog.index')->with('title', 'Категории');
     }
 
@@ -45,7 +46,7 @@ class CatalogController extends Controller
     public function store(StoreRequest $request): RedirectResponse
     {
         try {
-            $this->categoryRepository->create($request->all());
+            $this->categoryRepository->create(CatalogData::fromArray($request->validated()));
         } catch (Exception $e) {
             report($e);
 
@@ -78,7 +79,7 @@ class CatalogController extends Controller
     public function update(EditRequest $request): RedirectResponse
     {
         try {
-            $this->categoryRepository->update($request->id, $request->all());
+            $this->categoryRepository->update(CatalogData::fromArray($request->validated()));
         } catch (Exception $e) {
             report($e);
 
@@ -92,11 +93,15 @@ class CatalogController extends Controller
     }
 
     /**
-     * @param DeleteRequest $request
-     * @return RedirectResponse
+     * @param int $id
+     * @return JsonResponse
      */
-    public function destroy(DeleteRequest $request): RedirectResponse
+    public function destroy(int $id): JsonResponse
     {
-        $this->categoryRepository->delete($request->id);;
+        if (!$this->categoryRepository->delete($id)) {
+            return response()->json(['message' => 'Запись не найдена.'], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json(['message' => 'Данные успешно удалены.']);
     }
 }

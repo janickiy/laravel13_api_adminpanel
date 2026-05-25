@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\DTO\Contracts\UpdatableData;
 use App\Models\Notes;
 
 class NoteRepository extends BaseRepository
@@ -12,17 +13,15 @@ class NoteRepository extends BaseRepository
     }
 
     /**
-     * @param int $id
-     * @param array $data
+     * @param UpdatableData $data
      * @return Notes|null
      */
-    public function update(int $id, array $data): ?Notes
+    public function update(UpdatableData $data): ?Notes
     {
-        $model = $this->model->find($id);
+        $model = $this->model->find($data->id());
 
         if ($model) {
-            $model->title = $data['title'];
-            $model->content = $data['content'];
+            $model->fill($data->toArray());
             $model->save();
 
             return $model;

@@ -1,10 +1,10 @@
 <p align="center">
-    <h1 align="center">Laravel 12 adminpanel-api</h1>
+    <h1 align="center">Laravel 13 adminpanel-api</h1>
 </p>
 
 # Модули проекта
 - Docker
-- php:8.4-fpm
+- php:8.3-fpm
 - nginx:alpine
 - mysql
 - PostgreSQL

@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 
+use App\DTO\Contracts\ModelData;
+use App\DTO\Contracts\UpdatableData;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
@@ -17,29 +19,27 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
-     * @param array $data
+     * @param ModelData $data
      * @return mixed
      */
-    public function create(array $data): mixed
+    public function create(ModelData $data): mixed
     {
-        return $this->model->create($data);
+        return $this->model->create($data->toArray());
     }
 
     /**
-     * @param int $id
-     * @param array $data
+     * @param UpdatableData $data
      * @return Model|null
      */
-    public function update(int $id, array $data): ?Model
+    public function update(UpdatableData $data): ?Model
     {
-        $model = $this->model->find($id);
+        $model = $this->model->find($data->id());
 
         if ($model) {
-            foreach ($data as $key => $value) {
-                $model->$key = $value;
-            }
-
+            $model->fill($data->toArray());
             $model->save();
+
+            return $model;
         }
         return null;
     }

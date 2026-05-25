@@ -9,9 +9,8 @@ class CreateCatalogTable extends Migration
     /**
      * Run the migrations.
      *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('catalog', function (Blueprint $table) {
             $table->id();
@@ -23,9 +22,8 @@ class CreateCatalogTable extends Migration
     /**
      * Reverse the migrations.
      *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('catalog');
     }

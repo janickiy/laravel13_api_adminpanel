@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin\Admin;
 
+use App\Models\Admin;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class EditRequest extends FormRequest
 {
@@ -22,10 +24,18 @@ class EditRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'login' => 'required|max:255|unique:users,login,' . $this->id,
-            'name' => 'required',
-            'password' => 'min:6|nullable',
-            'password_again' => 'min:6|same:password|nullable',
+            'id' => ['required', 'integer', 'exists:' . Admin::getTableName() . ',id'],
+            'login' => [
+                'required',
+                'string',
+                'min:3',
+                'max:255',
+                Rule::unique(Admin::getTableName(), 'login')->ignore((int) $this->input('id')),
+            ],
+            'name' => ['required', 'string', 'max:255'],
+            'role' => ['nullable', Rule::in(array_keys(Admin::$role_name))],
+            'password' => ['nullable', 'string', 'min:6'],
+            'password_again' => ['nullable', 'string', 'min:6', 'same:password'],
         ];
     }
 }

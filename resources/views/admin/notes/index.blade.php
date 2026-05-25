@@ -102,12 +102,16 @@
                         'columns': [
                             {data: 'title', name: 'title'},
                             {data: 'content', name: 'content'},
-                            {data: 'action', name: 'action', orderable: false, searchable: false}
+                            {data: 'actions', name: 'actions', orderable: false, searchable: false}
                         ]
                     });
 
-                    $('#itemList').on('click', 'a.deleteRow', function () {
-                        let rowid = $(this).attr('id');
+                    $('#itemList').on('click', 'a.deleteRow', function (event) {
+                        event.preventDefault();
+
+                        let rowid = $(this).data('id');
+                        let deleteUrl = $(this).attr('href');
+
                         Swal.fire({
                             title: "Вы уверены?",
                             text: "Вы не сможете восстановить эту информацию!",
@@ -124,17 +128,16 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: '{{ route('admin.notes.destroy') }}',
-                                    type: "POST",
-                                    dataType: "html",
-                                    data: {id: rowid},
+                                    url: deleteUrl,
+                                    type: "DELETE",
+                                    dataType: "json",
                                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                                     success: function () {
                                         $("#rowid_" + rowid).remove();
                                         Swal.fire("Сделано!", "Данные успешно удалены!", 'success');
                                     },
                                     error: function (xhr, ajaxOptions, thrownError) {
-                                        Swal.fire("Ошибка при удалении!", "Попробуйте еще раз", 'error');
+                                        Swal.fire("Ошибка при удалении!", (xhr.responseJSON && xhr.responseJSON.message) || "Попробуйте еще раз", 'error');
                                         console.log(ajaxOptions);
                                         console.log(thrownError);
                                     }

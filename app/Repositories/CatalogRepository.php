@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\DTO\Contracts\UpdatableData;
 use App\Models\Catalog;
 
 class CatalogRepository extends BaseRepository
@@ -12,16 +13,15 @@ class CatalogRepository extends BaseRepository
     }
 
     /**
-     * @param int $id
-     * @param array $data
+     * @param UpdatableData $data
      * @return Catalog|null
      */
-    public function update(int $id, array $data): ?Catalog
+    public function update(UpdatableData $data): ?Catalog
     {
-        $model = $this->model->find($id);
+        $model = $this->model->find($data->id());
 
         if ($model) {
-            $model->name = $data['name'];
+            $model->fill($data->toArray());
             $model->save();
 
             return $model;
