@@ -11,7 +11,8 @@ use App\Http\Controllers\Admin\DataTableController;
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('login.submit');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard.index');
+Route::redirect('/', '/cp');
+Route::get('cp', [DashboardController::class, 'index'])->name('admin.dashboard.index');
 
 Route::group(['prefix' => 'admin'], function () {
     Route::get('', [AdminController::class, 'index'])->name('admin.admin.index');

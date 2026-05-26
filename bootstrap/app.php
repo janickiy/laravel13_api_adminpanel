@@ -20,15 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             \App\Http\Middleware\JsonResponseMiddleware::class,
         ]);
-        $middleware->redirectGuestsTo(function ($request) {
-            if (!$request->expectsJson()) {
-                if (in_array('auth:admin', $request->route()->middleware())) {
-                    if (!auth('admin')->check()) {
-                        return route('admin.dashboard.index');
-                    }
-                }
-            }
-        });
+        $middleware->redirectGuestsTo(fn (Request $request) => $request->expectsJson() ? null : route('login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
