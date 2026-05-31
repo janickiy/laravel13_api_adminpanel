@@ -6,11 +6,11 @@ use App\DTO\Catalog\CatalogData;
 use App\Repositories\CatalogRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
 use Illuminate\View\View;
 use App\Http\Requests\Admin\Catalog\{
     StoreRequest,
     EditRequest,
+    DeleteRequest,
 };
 use Exception;
 
@@ -46,7 +46,7 @@ class CatalogController extends Controller
     public function store(StoreRequest $request): RedirectResponse
     {
         try {
-            $this->categoryRepository->create(CatalogData::fromArray($request->validated()));
+            $this->categoryRepository->createFromData(CatalogData::fromArray($request->validated()));
         } catch (Exception $e) {
             report($e);
 
@@ -79,7 +79,7 @@ class CatalogController extends Controller
     public function update(EditRequest $request): RedirectResponse
     {
         try {
-            $this->categoryRepository->update(CatalogData::fromArray($request->validated()));
+            $this->categoryRepository->updateFromData(CatalogData::fromArray($request->validated()));
         } catch (Exception $e) {
             report($e);
 
@@ -93,14 +93,12 @@ class CatalogController extends Controller
     }
 
     /**
-     * @param int $id
+     * @param DeleteRequest $request
      * @return JsonResponse
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(DeleteRequest $request): JsonResponse
     {
-        if (!$this->categoryRepository->delete($id)) {
-            return response()->json(['message' => 'Запись не найдена.'], Response::HTTP_NOT_FOUND);
-        }
+        $this->categoryRepository->delete($request->id);
 
         return response()->json(['message' => 'Данные успешно удалены.']);
     }

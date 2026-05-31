@@ -2,9 +2,9 @@
 
 namespace App\DTO\Catalog;
 
-use App\DTO\Contracts\UpdatableData;
+use App\DTO\DataTransferObject;
 
-final readonly class CatalogData implements UpdatableData
+final readonly class CatalogData implements DataTransferObject
 {
     public function __construct(
         public int $id,

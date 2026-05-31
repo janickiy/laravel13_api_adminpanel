@@ -5,11 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegistrationRequest;
-use App\Models\User;
+use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use OpenApi\Attributes as OA;
 
 class AuthController extends Controller
@@ -19,8 +17,9 @@ class AuthController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct(
+        private UserRepository $userRepository,
+    ) {
         $this->middleware('auth:api', ['except' => ['login','register']]);
     }
 
@@ -69,7 +68,7 @@ class AuthController extends Controller
     )]
     public function register(RegistrationRequest $request): JsonResponse
     {
-        $user = User::create(array_merge($request->all(), ['password' => Hash::make($request->input('password'))]));
+        $user = $this->userRepository->createRegisteredUser($request->validated());
 
         return response()->json($user, 201);
     }
@@ -113,8 +112,9 @@ class AuthController extends Controller
     )]
     public function login(LoginRequest $request): JsonResponse
     {
-        $credentials = $request->only('email', 'password');
-        if (!$token = JWTAuth::attempt($credentials)) {
+        $token = $this->userRepository->attemptLogin($request->validated());
+
+        if (!$token) {
             return response()->json(['error' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -123,7 +123,8 @@ class AuthController extends Controller
 
     public function logout(): JsonResponse
     {
-        JWTAuth::invalidate(JWTAuth::getToken());
+        $this->userRepository->logoutCurrentToken();
+
         return response()->json(['message' => 'Successfully logged out']);
     }
 }

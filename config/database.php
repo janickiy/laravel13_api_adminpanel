@@ -88,7 +88,7 @@ return [
             'url' => env('PG_DB_URL'),
             'host' => env('PG_DB_HOST', '127.0.0.1'),
             'port' => env('PG_DB_PORT', '5432'),
-            'database' => env('PG_DB_DATABASE', 'laravel'),
+            'database' => env('PG_DB_NAME', env('PG_DB_DATABASE', 'laravel')),
             'username' => env('PG_DB_USER', 'root'),
             'password' => env('PG_DB_PASSWORD', ''),
             'charset' => env('PG_DB_CHARSET', 'utf8'),

@@ -2,9 +2,9 @@
 
 namespace App\DTO\Notes;
 
-use App\DTO\Contracts\UpdatableData;
+use App\DTO\DataTransferObject;
 
-final readonly class NoteData implements UpdatableData
+final readonly class NoteData implements DataTransferObject
 {
     public function __construct(
         public int $id,

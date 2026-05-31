@@ -2,7 +2,9 @@
 
 namespace App\DTO\Admin;
 
-final readonly class AdminData
+use App\DTO\DataTransferObject;
+
+final readonly class AdminData implements DataTransferObject
 {
     public function __construct(
         public int $id,

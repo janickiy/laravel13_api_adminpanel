@@ -2,8 +2,10 @@
 
 namespace App\Repositories;
 
-use App\DTO\Contracts\UpdatableData;
+use App\DTO\Catalog\CatalogData;
 use App\Models\Catalog;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class CatalogRepository extends BaseRepository
 {
@@ -12,20 +14,13 @@ class CatalogRepository extends BaseRepository
         parent::__construct($model);
     }
 
-    /**
-     * @param UpdatableData $data
-     * @return Catalog|null
-     */
-    public function update(UpdatableData $data): ?Catalog
+    public function createFromData(CatalogData $data): Builder|Model
     {
-        $model = $this->model->find($data->id());
+        return $this->create($data->toArray());
+    }
 
-        if ($model) {
-            $model->fill($data->toArray());
-            $model->save();
-
-            return $model;
-        }
-        return null;
+    public function updateFromData(CatalogData $data): bool
+    {
+        return $this->update($data->id(), $data->toArray());
     }
 }

@@ -3,9 +3,11 @@ services:
         build:
             context: .
             dockerfile: docker/php/Dockerfile
-        container_name: laravel12_api_admin_docker_app
         volumes:
             - .:/var/www/html
+            - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
         env_file: .env
         depends_on:
             - mysql_db
@@ -13,7 +15,6 @@ services:
 
     nginx:
         image: nginx:alpine
-        container_name: laravel12_api_admin_docker_app_nginx
         ports:
             - "8080:80"
         volumes:
@@ -24,7 +25,6 @@ services:
 
     mysql_db:
         image: mysql:8.0
-        container_name: laravel12_api_admin_docker_app_docker_mysql
         environment:
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_DATABASE: ${DB_DATABASE}
@@ -33,7 +33,6 @@ services:
 
     pg_db:
         image: postgres:15-alpine
-        container_name: laravel12_api_admin_docker_postgres
         environment:
             POSTGRES_DB: ${PG_DB_NAME}
             POSTGRES_USER: ${PG_DB_USER}
@@ -43,9 +42,10 @@ services:
 
     phpmyadmin:
         image: phpmyadmin:latest
-        container_name: laravel12_api_admin_docker_phpmyadmin
+        profiles:
+            - tools
         ports:
-            - "8081:80"
+            - "8089:80"
         environment:
             PMA_HOST: ${DB_HOST}
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
@@ -54,8 +54,6 @@ services:
 
     redis:
         image: redis:alpine
-        container_name: laravel12_api_admin_docker_redis
 
     memcached:
         image: memcached:alpine
-        container_name: laravel12_api_admin_docker_memcached

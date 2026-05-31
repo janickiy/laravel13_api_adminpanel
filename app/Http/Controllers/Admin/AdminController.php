@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\DTO\Admin\AdminData;
-use App\Models\Admin;
 use App\Http\Requests\Admin\Admin\StoreRequest;
 use App\Http\Requests\Admin\Admin\EditRequest;
+use App\Http\Requests\Admin\Admin\DeleteRequest;
+use App\Repositories\AdminRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Response;
 
 class AdminController extends Controller
 {
+    public function __construct(
+        private AdminRepository $adminRepository,
+    )
+    {
+        parent::__construct();
+    }
+
     /**
      * @return View
      */
@@ -28,7 +34,7 @@ class AdminController extends Controller
      */
     public function create(): View
     {
-        $options = Admin::$role_name;
+        $options = $this->adminRepository->roleOptions();
 
         return view('admin.admin.create_edit', compact('options'))->with('title', 'Добавить пользователя');
     }
@@ -39,11 +45,7 @@ class AdminController extends Controller
      */
     public function store(StoreRequest $request): RedirectResponse
     {
-        $data = AdminData::fromArray($request->validated());
-        $payload = $data->toArray();
-        $payload['password'] = Hash::make((string) $data->password);
-
-        Admin::create($payload);
+        $this->adminRepository->createFromArray($request->validated());
 
         return redirect()->route('admin.admin.index')->with('success', 'Информация успешно добавлена!');
     }
@@ -54,11 +56,11 @@ class AdminController extends Controller
      */
     public function edit(int $id): View
     {
-        $row = Admin::find($id);
+        $row = $this->adminRepository->find($id);
 
         if (!$row) abort(404);
 
-        $options = Admin::$role_name;
+        $options = $this->adminRepository->roleOptions();
 
         return view('admin.admin.create_edit', compact('row', 'options'))->with('title', 'Редактировать пользователя');
     }
@@ -69,43 +71,25 @@ class AdminController extends Controller
      */
     public function update(EditRequest $request): RedirectResponse
     {
-        $data = AdminData::fromArray($request->validated());
-        $admin = Admin::find($data->id);
-
-        if (!$admin) abort(404);
-
-        $payload = $data->toArray();
-
-        if ($data->password !== null) {
-            $payload['password'] = Hash::make($data->password);
-        }
-
-        $admin->fill($payload);
-        $admin->save();
+        if (!$this->adminRepository->updateFromArray($request->validated())) abort(404);
 
         return redirect()->route('admin.admin.index')->with('success', 'Данные успешно обновлены!');
     }
 
     /**
-     * @param int $id
+     * @param DeleteRequest $request
      * @return JsonResponse
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(DeleteRequest $request): JsonResponse
     {
-        if ($id === (int) Auth::id()) {
+        if ($request->id === (int)Auth::id()) {
             return response()->json(
                 ['message' => 'Нельзя удалить текущего пользователя.'],
                 Response::HTTP_FORBIDDEN,
             );
         }
 
-        $admin = Admin::find($id);
-
-        if (!$admin) {
-            return response()->json(['message' => 'Запись не найдена.'], Response::HTTP_NOT_FOUND);
-        }
-
-        $admin->delete();
+        $this->adminRepository->delete($request->id);
 
         return response()->json(['message' => 'Данные успешно удалены.']);
     }
