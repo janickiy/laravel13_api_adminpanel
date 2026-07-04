@@ -178,12 +178,527 @@
                     }
                 }
             }
+        },
+        "/api/v1/notes": {
+            "get": {
+                "tags": [
+                    "Notes"
+                ],
+                "summary": "Список заметок текущего пользователя",
+                "description": "Возвращает все заметки, принадлежащие авторизованному пользователю.",
+                "operationId": "9a959e36a067705923b1403aa9ce6bde",
+                "responses": {
+                    "200": {
+                        "description": "Список заметок",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "user_id": {
+                                                "type": "integer",
+                                                "example": 10
+                                            },
+                                            "title": {
+                                                "type": "string",
+                                                "example": "План на день"
+                                            },
+                                            "content": {
+                                                "type": "string",
+                                                "example": "Подготовить отчет и проверить задачи."
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2026-02-10T13:50:52.000000Z"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2026-02-10T13:50:52.000000Z"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Пользователь не авторизован",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notes/{id}": {
+            "get": {
+                "tags": [
+                    "Notes"
+                ],
+                "summary": "Просмотр заметки",
+                "description": "Возвращает одну заметку текущего пользователя по идентификатору.",
+                "operationId": "5710f9e34dc724463a3be835ecf3da5c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Идентификатор заметки",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Заметка найдена",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "План на день"
+                                        },
+                                        "content": {
+                                            "type": "string",
+                                            "example": "Подготовить отчет и проверить задачи."
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2026-02-10T13:50:52.000000Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2026-02-10T13:50:52.000000Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Пользователь не авторизован",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Заметка не найдена",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Note not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notes/store": {
+            "post": {
+                "tags": [
+                    "Notes"
+                ],
+                "summary": "Создание заметки",
+                "description": "Создает новую заметку для авторизованного пользователя.",
+                "operationId": "c24064665c9394fef0a7f5426e3a6d4e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "content"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "План на день",
+                                        "maxLength": 255
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Подготовить отчет и проверить задачи."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Заметка создана",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "План на день"
+                                        },
+                                        "content": {
+                                            "type": "string",
+                                            "example": "Подготовить отчет и проверить задачи."
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2026-02-10T13:50:52.000000Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2026-02-10T13:50:52.000000Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Пользователь не авторизован",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The title field is required."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notes/update/{id}": {
+            "put": {
+                "tags": [
+                    "Notes"
+                ],
+                "summary": "Обновление заметки",
+                "description": "Обновляет заголовок и содержимое заметки текущего пользователя.",
+                "operationId": "4161f162a4ab1328e89fee15d08e4e26",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Идентификатор заметки",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "content",
+                                    "id"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "description": "Идентификатор заметки. Сейчас требуется валидатором запроса.",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Обновленный план",
+                                        "maxLength": 255
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Обновить отчет и отправить результат."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Заметка обновлена",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Обновленный план"
+                                        },
+                                        "content": {
+                                            "type": "string",
+                                            "example": "Обновить отчет и отправить результат."
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2026-02-10T13:50:52.000000Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2026-02-10T14:10:52.000000Z"
+                                        }
+                                    },
+                                    "type": "object",
+                                    "nullable": true
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Пользователь не авторизован",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The id field is required."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notes/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Notes"
+                ],
+                "summary": "Удаление заметки",
+                "description": "Удаляет заметку текущего пользователя по идентификатору.",
+                "operationId": "3b070a974a3e3572c1105fca1349b81e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Идентификатор заметки",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Заметка удалена",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Note deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Пользователь не авторизован",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The id field is required."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
         }
     },
     "tags": [
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "Notes",
+            "description": "Notes"
         }
     ]
 }
